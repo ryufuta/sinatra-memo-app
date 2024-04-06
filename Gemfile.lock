@@ -48,6 +48,7 @@ GEM
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
     minitest (5.22.3)
+    multi_json (1.15.0)
     mustermann (3.0.0)
       ruby2_keywords (~> 0.0.1)
     mutex_m (0.2.0)
@@ -104,6 +105,12 @@ GEM
       rack-protection (= 4.0.0)
       rack-session (>= 2.0.0, < 3)
       tilt (~> 2.0)
+    sinatra-contrib (4.0.0)
+      multi_json (>= 0.0.2)
+      mustermann (~> 3.0)
+      rack-protection (= 4.0.0)
+      sinatra (= 4.0.0)
+      tilt (~> 2.0)
     smart_properties (1.17.0)
     tilt (2.3.0)
     tzinfo (2.0.6)
@@ -119,6 +126,7 @@ DEPENDENCIES
   rackup
   rubocop-fjord
   sinatra
+  sinatra-contrib
   webrick
 
 BUNDLED WITH
