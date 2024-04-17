@@ -16,3 +16,22 @@ get '/memos' do
   end
   erb :index
 end
+
+get '/memos/:id' do |memo_id|
+  memo_id = memo_id.to_i
+  raise Sinatra::NotFound if memo_id.zero?
+
+  @title = 'show memo'
+  @memo = nil
+  CSV.foreach(MEMO_FILE_NAME) do |id, title, content|
+    id = id.to_i
+    if id == memo_id
+      @memo = Memo.new(id, title, content)
+      break
+    end
+  end
+
+  raise Sinatra::NotFound if @memo.nil?
+
+  erb :show
+end
