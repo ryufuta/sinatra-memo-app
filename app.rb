@@ -7,19 +7,17 @@ require 'sinatra/reloader'
 
 MEMO_FILE_NAME = 'memos.csv'
 
-Memo = Data.define(:id, :title, :content)
-
 def load_memos
   memos = []
   CSV.foreach(MEMO_FILE_NAME) do |id, title, content|
-    memos << Memo.new(id, title, content)
+    memos << { id:, title:, content: }
   end
   memos
 end
 
 def save_memos(memos)
   CSV.open(MEMO_FILE_NAME, 'w') do |csv|
-    memos.each { |memo| csv << memo.deconstruct }
+    memos.each { |memo| csv << memo.fetch_values(:id, :title, :content) }
   end
 end
 
@@ -39,19 +37,19 @@ get '/memos/new' do
 end
 
 post '/memos' do
-  memos << Memo.new(SecureRandom.uuid, params[:title], params[:content])
+  memos << { id: SecureRandom.uuid, title: params[:title], content: params[:content] }
   redirect '/memos'
 end
 
 get '/memos/:id' do |memo_id|
   @title = 'show memo'
-  @memo = memos.find { |memo| memo.id == memo_id }
+  @memo = memos.find { |memo| memo[:id] == memo_id }
   raise Sinatra::NotFound if @memo.nil?
 
   erb :show
 end
 
 delete '/memos/:id' do |memo_id|
-  memos = memos.reject { |memo| memo.id == memo_id }
+  memos = memos.reject { |memo| memo[:id] == memo_id }
   redirect '/memos'
 end
