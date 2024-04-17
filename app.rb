@@ -32,6 +32,16 @@ get '/memos' do
   erb :index
 end
 
+get '/memos/new' do
+  @title = 'new memo'
+  erb :new
+end
+
+post '/memos' do
+  memos << Memo.new(memos.size + 1, params[:title], params[:content])
+  redirect '/memos'
+end
+
 get '/memos/:id' do |memo_id|
   memo_id = memo_id.to_i
   raise Sinatra::NotFound if memo_id.zero?
