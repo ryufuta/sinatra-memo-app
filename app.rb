@@ -8,12 +8,19 @@ MEMO_FILE_NAME = 'memos.csv'
 
 Memo = Data.define(:id, :title, :content)
 
+def load_memos
+  memos = []
+  CSV.foreach(MEMO_FILE_NAME) do |id, title, content|
+    memos << Memo.new(id.to_i, title, content)
+  end
+  memos
+end
+
+memos = load_memos
+
 get '/memos' do
   @title = 'memo list'
-  @memos = []
-  CSV.foreach(MEMO_FILE_NAME) do |id, title, content|
-    @memos << Memo.new(id.to_i, title, content)
-  end
+  @memos = memos
   erb :index
 end
 
@@ -22,15 +29,7 @@ get '/memos/:id' do |memo_id|
   raise Sinatra::NotFound if memo_id.zero?
 
   @title = 'show memo'
-  @memo = nil
-  CSV.foreach(MEMO_FILE_NAME) do |id, title, content|
-    id = id.to_i
-    if id == memo_id
-      @memo = Memo.new(id, title, content)
-      break
-    end
-  end
-
+  @memo = memos.find { |memo| memo.id == memo_id }
   raise Sinatra::NotFound if @memo.nil?
 
   erb :show
