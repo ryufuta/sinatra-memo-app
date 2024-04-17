@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'csv'
+require 'securerandom'
 require 'sinatra'
 require 'sinatra/reloader'
 
@@ -11,7 +12,7 @@ Memo = Data.define(:id, :title, :content)
 def load_memos
   memos = []
   CSV.foreach(MEMO_FILE_NAME) do |id, title, content|
-    memos << Memo.new(id.to_i, title, content)
+    memos << Memo.new(id, title, content)
   end
   memos
 end
@@ -38,14 +39,11 @@ get '/memos/new' do
 end
 
 post '/memos' do
-  memos << Memo.new(memos.size + 1, params[:title], params[:content])
+  memos << Memo.new(SecureRandom.uuid, params[:title], params[:content])
   redirect '/memos'
 end
 
 get '/memos/:id' do |memo_id|
-  memo_id = memo_id.to_i
-  raise Sinatra::NotFound if memo_id.zero?
-
   @title = 'show memo'
   @memo = memos.find { |memo| memo.id == memo_id }
   raise Sinatra::NotFound if @memo.nil?
@@ -54,7 +52,6 @@ get '/memos/:id' do |memo_id|
 end
 
 delete '/memos/:id' do |memo_id|
-  memo_id = memo_id.to_i
   memos = memos.reject { |memo| memo.id == memo_id }
   redirect '/memos'
 end
