@@ -16,7 +16,15 @@ def load_memos
   memos
 end
 
+def save_memos(memos)
+  CSV.open(MEMO_FILE_NAME, 'w') do |csv|
+    memos.each { |memo| csv << memo.deconstruct }
+  end
+end
+
 memos = load_memos
+
+Signal.trap(:INT) { save_memos(memos) }
 
 get '/memos' do
   @title = 'memo list'
