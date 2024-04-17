@@ -34,3 +34,9 @@ get '/memos/:id' do |memo_id|
 
   erb :show
 end
+
+delete '/memos/:id' do |memo_id|
+  memo_id = memo_id.to_i
+  memos = memos.reject { |memo| memo.id == memo_id }
+  redirect '/memos'
+end
