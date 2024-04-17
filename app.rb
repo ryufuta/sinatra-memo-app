@@ -49,6 +49,21 @@ get '/memos/:id' do |memo_id|
   erb :show
 end
 
+get '/memos/:id/edit' do |memo_id|
+  @title = 'edit memo'
+  @memo = memos.find { |memo| memo[:id] == memo_id }
+  raise Sinatra::NotFound if @memo.nil?
+
+  erb :edit
+end
+
+patch '/memos/:id' do |memo_id|
+  memo_edited = memos.find { |memo| memo[:id] == memo_id }
+  memo_edited[:title] = params[:title]
+  memo_edited[:content] = params[:content]
+  redirect '/memos'
+end
+
 delete '/memos/:id' do |memo_id|
   memos = memos.reject { |memo| memo[:id] == memo_id }
   redirect '/memos'
