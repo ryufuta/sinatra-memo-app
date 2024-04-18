@@ -69,6 +69,10 @@ delete '/memos/:id' do |memo_id|
   redirect '/memos'
 end
 
+not_found do
+  erb :not_found, layout: false
+end
+
 helpers do
   def h(text)
     Rack::Utils.escape_html(text)
