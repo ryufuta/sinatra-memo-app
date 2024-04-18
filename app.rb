@@ -68,3 +68,13 @@ delete '/memos/:id' do |memo_id|
   memos = memos.reject { |memo| memo[:id] == memo_id }
   redirect '/memos'
 end
+
+helpers do
+  def h(text)
+    Rack::Utils.escape_html(text)
+  end
+
+  def hattr(text)
+    Rack::Utils.escape_path(text)
+  end
+end

@@ -1,5 +1,5 @@
-<h2><%= @memo[:title] %></h2>
-<p><%= @memo[:content] %></p>
+<h2><%== @memo[:title] %></h2>
+<p><%== @memo[:content] %></p>
 <button><a href="/memos/<%= @memo[:id] %>/edit">変更</a></button>
 <form method="POST" action="/memos/<%= @memo[:id] %>">
   <button>削除</button>
