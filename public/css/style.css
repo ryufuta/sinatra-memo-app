@@ -3,3 +3,8 @@
 p {
   white-space: pre-wrap;
 }
+
+button > a {
+  text-decoration: none;
+  color: buttontext;
+}
