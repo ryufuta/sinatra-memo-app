@@ -9,8 +9,10 @@ MEMO_FILE_NAME = 'memos.csv'
 
 def load_memos
   memos = []
-  CSV.foreach(MEMO_FILE_NAME) do |id, title, content|
-    memos << { id:, title:, content: }
+  if File.exist?(MEMO_FILE_NAME)
+    CSV.foreach(MEMO_FILE_NAME) do |id, title, content|
+      memos << { id:, title:, content: }
+    end
   end
   memos
 end
