@@ -1,35 +1,18 @@
 # frozen_string_literal: true
 
-require 'csv'
-require 'securerandom'
+require 'pg'
 require 'sinatra'
 require 'sinatra/reloader'
 
-MEMO_FILE_NAME = 'memos.csv'
+DB_NAME = 'memo_app'
+USER = 'postgres'
+TABLE_NAME = 'memos'
 
-def load_memos
-  memos = []
-  if File.exist?(MEMO_FILE_NAME)
-    CSV.foreach(MEMO_FILE_NAME) do |id, title, content|
-      memos << { id:, title:, content: }
-    end
-  end
-  memos
-end
-
-def save_memos(memos)
-  CSV.open(MEMO_FILE_NAME, 'w') do |csv|
-    memos.each { |memo| csv << memo.fetch_values(:id, :title, :content) }
-  end
-end
-
-memos = load_memos
-
-Signal.trap(:INT) { save_memos(memos) }
+conn = PG.connect(dbname: DB_NAME, user: USER)
 
 get '/memos' do
   @title = 'memo list'
-  @memos = memos
+  @memos = conn.exec("SELECT * FROM #{TABLE_NAME}").values.map { |id, title, content| { id:, title:, content: } }
   erb :index
 end
 
@@ -39,13 +22,13 @@ get '/memos/new' do
 end
 
 post '/memos' do
-  memos << { id: SecureRandom.uuid, title: params[:title], content: params[:content] }
+  conn.exec("INSERT INTO #{TABLE_NAME} (title, content) VALUES ('#{params[:title]}', '#{params[:content]}')")
   redirect '/memos'
 end
 
 get '/memos/:id' do |memo_id|
   @title = 'show memo'
-  @memo = memos.find { |memo| memo[:id] == memo_id }
+  @memo = conn.exec("SELECT * FROM #{TABLE_NAME} WHERE id = #{memo_id}").values.map { |id, title, content| { id:, title:, content: } }[0]
   raise Sinatra::NotFound if @memo.nil?
 
   erb :show
@@ -53,21 +36,19 @@ end
 
 get '/memos/:id/edit' do |memo_id|
   @title = 'edit memo'
-  @memo = memos.find { |memo| memo[:id] == memo_id }
+  @memo = conn.exec("SELECT * FROM #{TABLE_NAME} WHERE id = #{memo_id}").values.map { |id, title, content| { id:, title:, content: } }[0]
   raise Sinatra::NotFound if @memo.nil?
 
   erb :edit
 end
 
 patch '/memos/:id' do |memo_id|
-  memo_edited = memos.find { |memo| memo[:id] == memo_id }
-  memo_edited[:title] = params[:title]
-  memo_edited[:content] = params[:content]
+  conn.exec("UPDATE #{TABLE_NAME} SET (title, content) = ('#{params[:title]}', '#{params[:content]}') WHERE id = #{memo_id}")
   redirect '/memos'
 end
 
 delete '/memos/:id' do |memo_id|
-  memos = memos.reject { |memo| memo[:id] == memo_id }
+  conn.exec("DELETE FROM #{TABLE_NAME} WHERE id = #{memo_id}")
   redirect '/memos'
 end
 
