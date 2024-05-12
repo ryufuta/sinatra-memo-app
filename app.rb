@@ -22,13 +22,13 @@ get '/memos/new' do
 end
 
 post '/memos' do
-  conn.exec("INSERT INTO #{TABLE_NAME} (title, content) VALUES ('#{params[:title]}', '#{params[:content]}')")
+  conn.exec_params("INSERT INTO #{TABLE_NAME} (title, content) VALUES ($1, $2)", [params[:title], params[:content]])
   redirect '/memos'
 end
 
 get '/memos/:id' do |memo_id|
   @title = 'show memo'
-  @memo = conn.exec("SELECT * FROM #{TABLE_NAME} WHERE id = #{memo_id}").values.map { |id, title, content| { id:, title:, content: } }[0]
+  @memo = conn.exec_params("SELECT * FROM #{TABLE_NAME} WHERE id = $1", [memo_id]).values.map { |id, title, content| { id:, title:, content: } }[0]
   raise Sinatra::NotFound if @memo.nil?
 
   erb :show
@@ -36,19 +36,19 @@ end
 
 get '/memos/:id/edit' do |memo_id|
   @title = 'edit memo'
-  @memo = conn.exec("SELECT * FROM #{TABLE_NAME} WHERE id = #{memo_id}").values.map { |id, title, content| { id:, title:, content: } }[0]
+  @memo = conn.exec_params("SELECT * FROM #{TABLE_NAME} WHERE id = $1", [memo_id]).values.map { |id, title, content| { id:, title:, content: } }[0]
   raise Sinatra::NotFound if @memo.nil?
 
   erb :edit
 end
 
 patch '/memos/:id' do |memo_id|
-  conn.exec("UPDATE #{TABLE_NAME} SET (title, content) = ('#{params[:title]}', '#{params[:content]}') WHERE id = #{memo_id}")
+  conn.exec_params("UPDATE #{TABLE_NAME} SET (title, content) = ($1, $2) WHERE id = $3", [params[:title], params[:content], memo_id])
   redirect '/memos'
 end
 
 delete '/memos/:id' do |memo_id|
-  conn.exec("DELETE FROM #{TABLE_NAME} WHERE id = #{memo_id}")
+  conn.exec_params("DELETE FROM #{TABLE_NAME} WHERE id = $1", [memo_id])
   redirect '/memos'
 end
 
