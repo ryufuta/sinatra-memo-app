@@ -6,6 +6,12 @@ FBCのプラクティス「Sinatraを使ってWebアプリケーションの基�
 
     $ bundle install
 
+## データベースとテーブル作成
+
+PostgreSQLでユーザー`postgres`を追加した上で以下を実行。
+
+    $ ./dbinit.sh
+
 ## 起動
 
     $ bundle exec ruby app.rb
